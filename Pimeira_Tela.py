@@ -47,7 +47,7 @@ class Login:
                 else:
                     tkinter.messagebox._show(title="novo", message="Login e/ou Senha Incorreta!")
             except sqlite3 as erro:
-                print('problema ao se conectar ccom o bd')
+                print('Problema ao se conectar com o BD')
 
         # FINALIZA O PROGRAMA
         def sair():
