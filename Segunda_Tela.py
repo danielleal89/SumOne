@@ -1,21 +1,13 @@
 from tkinter import *
 import tkinter as tk
-from tkinter import ttk
 import tkinter.messagebox
 import sqlite3
 import tkinter.ttk as ttk
-from datetime import datetime
 
-# HORARIO E DATA - APAGAR --------------------------------------------
-now = datetime.now()
-print(now)
-print(f'{now.hour}:{now.minute}')
-print(now.minute)
 
-# MUDAR PARA BANCO.DB ------------------------------------------------
-conn = sqlite3.connect('logs.db')
+# CONEXÃO COM O BANCO
+conn = sqlite3.connect('banco.db')
 cursor = conn.cursor()
-
 
 root = Tk()
 # CONFIGURAÇÕES DA JANELA
@@ -27,7 +19,7 @@ class Cadastro:
         self.master = master
         self.master.title("Cadastro de Compras")
 
-        Label(self.master,text="OPERADOR:", background='#00B2EE', font=('Windings', 12)).place(x=80, y=10)
+        Label(self.master,text="Cadastrar Compra", background='#00B2EE', font=('Windings', 14)).place(x=130, y=15)
         # RECEBE O CPF
         Label(self.master, text="CPF", background='#00B2EE', font=('Windings', 11)).place(x=50, y=70)
         self.cpf = tkinter.Entry(self.master)
@@ -43,6 +35,7 @@ class Cadastro:
 
         # CALCULO DO TOTAL
         Label(self.master, text="Total R$", background='#00B2EE', font=('Windings',12)).place(x=225, y=348)
+
         self.total = Entry(self.master)
         self.total.place(x=289, y=348, width=90, height=22)
 
@@ -50,48 +43,56 @@ class Cadastro:
         self.cpf.focus_force()
 
 
+        # RETORNO TELA DE LOGIN
+        def voltar():
+            self.master.destroy()
+            from Pimeira_Tela import Login
+            callable('Primeira_Tela.py python')
+
         # LIMPA OS CAMPOS PARA NOVA INSERÇÃO
         def limpar():
             self.produto.delete(0, END)
             self.valor.delete(0, END)
 
         # ADICIONA O PRODUTO E O VALOR NA LISTA
-        def insert_data():
-            """
-            Insertion method.
-            """
+        def add_lista():
+            # METODO DE INSERÇÃO
             self.treeview.insert('', 'end', text="Item_" + str(self.i),
                                  values=(self.produto.get(), self.valor.get()))
-            # Increment counter
             self.i = self.i + 1
             # BLOQUEIA O CAMPO CPF APOS A PRIMEIRA INSERÇÃO
             self.cpf.configure(state="readonly")
-            #cursor.execute("""insert into completa (cpf, produto, valor, hora, data) values (?,?,?,datetime('now'),?)""", (self.cpf.get(), self.produto.get(), self.valor.get(), self.produto.get()))
-            cursor.execute(
-                """insert into completa (cpf, produto, valor, hora, data) values (?,?,?,strftime('%d-%m-%Y'), strftime('%H:%M'))""",
-                (self.cpf.get(), self.produto.get(), self.valor.get()))
+            # INSERE OS VALORES DIGITADOS NA TABELA
+            cursor.execute("""INSERT INTO vendas (cpf, produto, valor) VALUES (?,?,?)""",
+                           (self.cpf.get(), self.produto.get(), self.valor.get()))
             conn.commit()
 
-        # ENVIA OS DADOS PARA O BANCO E LIMPA TODOS OS CAMPOS
-        def enviar_bd():
 
+        # ENVIA OS DADOS PARA O BANCO
+        def enviar_bd():
+            cursor.execute("""INSERT INTO registro (operador, cpf, valorTotal, data, hora) VALUES
+                           (?,?,?,strftime('%d-%m-%Y','now','localtime'),strftime('%H:%M','now','localtime'))""",
+                            (self.produto.get(), self.cpf.get(),self.valor.get()))
+            conn.commit()
+            # LIMPA TODOS OS CAMPOS
             self.cpf.configure(state='normal')
             self.cpf.delete(0, END)
             self.produto.delete(0, END)
             self.valor.delete(0, END)
             self.total.delete(0, END)
-
+            self.tree.delete(*self.tree.get_children())
 
         # BOTAO Q ENVIA PARA O BANCO DE DADOS
         self.enviar = tkinter.Button(self.master, text="Salvar", font=('Widings', 10),command=enviar_bd)
         self.enviar.place(x=30 ,y=348, width= 65, height=26)
-
-
         # BOTAO Q ENVIA PARA A LISTA
-        self.add = tkinter.Button(self.master, text="Adicionar", font=('Windings',10), command=insert_data)
+        self.add = tkinter.Button(self.master, text="Adicionar", font=('Windings',10), command=add_lista)
         self.add.place(x=255, y=150, width=65, height=26)
         self.limpar = tkinter.Button(self.master, width=7, text="Limpar", command=limpar)
         self.limpar.place(x=330, y=150, width=65, height=26)
+        # RETORNO TELA DE LOGIN
+        self.add = tkinter.Button(self.master, text="<", font=('Windings', 10), command=voltar)
+        self.add.place(x=5, y=5, width=25, height=20)
 
 
         # TABELA DE INSERÇÃO DOS PRODUTOS
@@ -111,23 +112,5 @@ class Cadastro:
         # INICIALIZA O CONTADOR
         self.i = 1
 
-
-
-
-
-        """# GRAVA NO BD AS COMPRAS
-        def salvar():
-            if int(self.qtd.get()) <= 1:
-                self.lista.insert(-0, self.valor.get())
-                self.lista2.insert(-0, self.produto.get())
-            else:
-                soma = (int(self.valor.get()) * int(self.qtd.get()))
-                self.lista.insert(0, soma, self.produto.get())
-            # cpf1 = self.cpf.get()
-            # sql = "insert into teste (id) values ('"+cpf1+"')"
-            # tkinter.messagebox._show(title="novo", message="Compra Cadastrada!")
-            # cursor.execute(sql)
-            # conn.commit()
-"""
 Cadastro(root)
 root.mainloop()
