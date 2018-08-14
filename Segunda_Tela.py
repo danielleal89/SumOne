@@ -49,6 +49,12 @@ class Cadastro:
             from Pimeira_Tela import Login
             callable('Primeira_Tela.py python')
 
+        # AVANÇA TELA DE COMPRAS CADASTRADAS
+        def compra():
+            self.master.destroy()
+            from Terceira_Tela import Compras
+            callable('Terceira_Tela.py python')
+
         # LIMPA OS CAMPOS PARA NOVA INSERÇÃO
         def limpar():
             self.produto.delete(0, END)
@@ -92,8 +98,10 @@ class Cadastro:
         self.limpar.place(x=330, y=150, width=65, height=26)
         # RETORNO TELA DE LOGIN
         self.add = tkinter.Button(self.master, text="<", font=('Windings', 10), command=voltar)
-        self.add.place(x=5, y=5, width=25, height=20)
-
+        self.add.place(x=8, y=5, width=25, height=21)
+        # AVANÇA TELA DE CADASTRO DE COMPRAS
+        self.add = tkinter.Button(self.master, text="Compras", font=('Windings', 10), command=compra)
+        self.add.place(x=362, y=8, width=65, height=21)
 
         # TABELA DE INSERÇÃO DOS PRODUTOS
         self.tree = ttk.Treeview(self.master, columns=('Nº', 'Produto', 'Valor R$'))

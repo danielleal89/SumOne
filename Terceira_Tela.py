@@ -13,7 +13,7 @@ root = Tk()
 root.geometry("588x390+0+0")
 root.configure(background='#00B2EE')
 
-class Loginss:
+class Compras:
     def __init__(self, master):
         self.master = master
         self.master.title("Cadastro de Compras")
@@ -124,5 +124,5 @@ class Loginss:
         self.add = tkinter.Button(self.master, text="<", font=('Windings', 10), command=voltar)
         self.add.place(x=5, y=5, width=25, height=20)
 
-Loginss(root)
+Compras(root)
 root.mainloop()
